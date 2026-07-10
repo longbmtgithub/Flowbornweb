@@ -1,0 +1,46 @@
+# Ignore private credentials and tokens
+.gist_token
+users.json
+.bot_admins.json
+
+# Ignore temporary and packet capture files (which contain tokens)
+*.har
+v282929
+Dang
+obus-sg.dc.heytapmobile.com_*
+
+# Ignore python compile files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore local configuration and scratch files
+scratch/
+local/
+.agents/
+.gemini/
+
+# Ignore raw source code files
+v2.py
+*_src.py
+loadtran_original.py
+crack_test.py
+test_*.py
+obfuscate*.py
+
+# Ignore screenshots and test assets
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.mp4
+
+# Ignore zip and archives
+*.zip
+*.rar
+*.tar.gz
+FlowbornPosterTool_*
+release/
+temp_extract/
