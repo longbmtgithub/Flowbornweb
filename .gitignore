@@ -44,3 +44,4 @@ obfuscate*.py
 FlowbornPosterTool_*
 release/
 temp_extract/
+v4_test/
