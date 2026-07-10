@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowborn V4 - Quản lý tài khoản</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #fbbf24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #4f46e5; }
+        .blob-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: #db2777; }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            max-width: 750px;
+            width: 100%;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 12px -3px rgba(59, 130, 246, 0.3);
+            background: var(--primary-hover);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 8px 12px -3px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            box-shadow: 0 8px 12px -3px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        /* Table styles */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 12px 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Modal popup */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #1e293b;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            width: 400px;
+            max-width: 90vw;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #cbd5e1;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Notifications */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container">
+        <div class="header-bar">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <a href="/" class="btn btn-secondary btn-sm"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+                <h1>Quản lý tài khoản</h1>
+            </div>
+            <button class="btn btn-success btn-sm" onclick="showAddModal()"><i class="fa-solid fa-user-plus"></i> Thêm tài khoản</button>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tên đăng nhập</th>
+                        <th>Mật khẩu</th>
+                        <th style="text-align: right;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Dynamic rendering -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addModal" class="modal-overlay" onclick="if(event.target===this)closeModal('addModal')">
+        <div class="modal">
+            <h3>Thêm tài khoản mới</h3>
+            <div class="form-group">
+                <label for="addUsername">Tên đăng nhập</label>
+                <input type="text" id="addUsername" placeholder="Nhập tên đăng nhập">
+            </div>
+            <div class="form-group">
+                <label for="addPassword">Mật khẩu</label>
+                <input type="text" id="addPassword" placeholder="Nhập mật khẩu">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('addModal')">Hủy</button>
+                <button class="btn btn-success btn-sm" onclick="handleAddUser()">Thêm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editModal" class="modal-overlay" onclick="if(event.target===this)closeModal('editModal')">
+        <div class="modal">
+            <h3>Đổi mật khẩu</h3>
+            <div class="form-group">
+                <label for="editUsername">Tên đăng nhập</label>
+                <input type="text" id="editUsername" disabled style="opacity: 0.6;">
+            </div>
+            <div class="form-group">
+                <label for="editPassword">Mật khẩu mới</label>
+                <input type="text" id="editPassword" placeholder="Nhập mật khẩu mới">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('editModal')">Hủy</button>
+                <button class="btn btn-success btn-sm" onclick="handleEditUser()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.background = isSuccess ? 'var(--success)' : 'var(--danger)';
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users');
+                const users = await response.json();
+                
+                const tbody = document.getElementById('userTableBody');
+                tbody.innerHTML = '';
+                
+                Object.entries(users).forEach(([username, password]) => {
+                    const tr = document.createElement('tr');
+                    
+                    const tdUser = document.createElement('td');
+                    tdUser.textContent = username;
+                    tdUser.style.fontWeight = '600';
+                    if (username === 'admin') {
+                        tdUser.innerHTML += ' <span style="font-size: 10px; background: rgba(59, 130, 246, 0.2); color: var(--primary); padding: 2px 6px; border-radius: 4px; margin-left: 6px;">ADMIN</span>';
+                    }
+                    
+                    const tdPass = document.createElement('td');
+                    tdPass.textContent = password;
+                    tdPass.style.fontFamily = 'monospace';
+                    
+                    const tdActions = document.createElement('td');
+                    tdActions.style.textAlign = 'right';
+                    tdActions.style.display = 'flex';
+                    tdActions.style.justifyContent = 'flex-end';
+                    tdActions.style.gap = '8px';
+                    
+                    const btnEdit = document.createElement('button');
+                    btnEdit.className = 'btn btn-secondary btn-sm';
+                    btnEdit.innerHTML = '<i class="fa-solid fa-key"></i> Đổi mật khẩu';
+                    btnEdit.onclick = () => showEditModal(username);
+                    
+                    tdActions.appendChild(btnEdit);
+
+                    if (username !== 'admin') {
+                        const btnDelete = document.createElement('button');
+                        btnDelete.className = 'btn btn-danger btn-sm';
+                        btnDelete.innerHTML = '<i class="fa-solid fa-trash"></i> Xóa';
+                        btnDelete.onclick = () => handleDeleteUser(username);
+                        tdActions.appendChild(btnDelete);
+                    }
+                    
+                    tr.appendChild(tdUser);
+                    tr.appendChild(tdPass);
+                    tr.appendChild(tdActions);
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                showToast('Không thể tải danh sách tài khoản', false);
+            }
+        }
+
+        function showAddModal() {
+            document.getElementById('addUsername').value = '';
+            document.getElementById('addPassword').value = '';
+            document.getElementById('addModal').classList.add('active');
+        }
+
+        function showEditModal(username) {
+            document.getElementById('editUsername').value = username;
+            document.getElementById('editPassword').value = '';
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        async function handleAddUser() {
+            const username = document.getElementById('addUsername').value.trim();
+            const password = document.getElementById('addPassword').value.trim();
+
+            if (!username || !password) {
+                showToast('Vui lòng điền đầy đủ thông tin', false);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/users/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('Đã thêm tài khoản thành công');
+                    closeModal('addModal');
+                    loadUsers();
+                } else {
+                    showToast(result.error || 'Thêm tài khoản thất bại', false);
+                }
+            } catch (err) {
+                showToast('Lỗi kết nối máy chủ', false);
+            }
+        }
+
+        async function handleEditUser() {
+            const username = document.getElementById('editUsername').value;
+            const password = document.getElementById('editPassword').value.trim();
+
+            if (!password) {
+                showToast('Vui lòng nhập mật khẩu mới', false);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/users/edit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('Đã đổi mật khẩu thành công');
+                    closeModal('editModal');
+                    loadUsers();
+                } else {
+                    showToast(result.error || 'Đổi mật khẩu thất bại', false);
+                }
+            } catch (err) {
+                showToast('Lỗi kết nối máy chủ', false);
+            }
+        }
+
+        async function handleDeleteUser(username) {
+            if (!confirm(`Bạn có chắc chắn muốn xóa tài khoản "${username}" không?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/users/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('Đã xóa tài khoản thành công');
+                    loadUsers();
+                } else {
+                    showToast(result.error || 'Xóa tài khoản thất bại', false);
+                }
+            } catch (err) {
+                showToast('Lỗi kết nối máy chủ', false);
+            }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', loadUsers);
+    </script>
+</body>
+</html>
